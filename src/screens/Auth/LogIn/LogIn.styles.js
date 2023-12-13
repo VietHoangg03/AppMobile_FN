@@ -1,5 +1,6 @@
-import {StyleSheet} from 'react-native';
+import {StyleSheet, View, Text} from 'react-native';
 import {colors} from '@theme/colors';
+import LinearGradient from 'react-native-linear-gradient';
 
 export const styles = StyleSheet.create({
   container: {
@@ -8,8 +9,10 @@ export const styles = StyleSheet.create({
     padding: 20,
   },
   logo: {
-    width: '70%',
-    height: 200,
+    width: '100%',
+    height: 160,
+    marginBottom: 30,
+    marginTop: 30,
   },
   text: {
     fontSize: 32,

@@ -66,22 +66,23 @@ const LogIn = ({navigation}) => {
   };
 
   const validate = {
+    // eslint-disable-next-line no-shadow
     email: function (email) {
       if (!email) {
-        setErrors({...errors, email: 'Please add your email.'});
+        setErrors({...errors, email: 'Vui lòng không bỏ trống email.'});
       } else if (!validateEmail(email)) {
-        setErrors({...errors, email: 'Please enter a valid email address.'});
+        setErrors({...errors, email: 'Email không đúng vui lòng điền lại.'});
       } else {
         setErrors({...errors, email: ''});
       }
     },
     password: function (password) {
       if (!password) {
-        setErrors({...errors, password: 'Please add your password.'});
+        setErrors({...errors, password: 'Vui lòng điền vào mật khẩu.'});
       } else if (!validatePassword(password)) {
         setErrors({
           ...errors,
-          password: 'Password must be at least 8 characters.',
+          password: 'Mật khẩu phải từ 8 ký tự.',
         });
       } else {
         setErrors({...errors, password: ''});
@@ -92,6 +93,7 @@ const LogIn = ({navigation}) => {
   return (
     <ScrollView>
       <View
+        // eslint-disable-next-line react-native/no-inline-styles
         style={{
           paddingTop: 12,
         }}>
@@ -103,9 +105,11 @@ const LogIn = ({navigation}) => {
           tHeight={40}
           tWidth={340}
           aSize={40}
+          // eslint-disable-next-line react-native/no-inline-styles
           containerStyles={{
             marginBottom: 10,
-          }}></ContentLoader>
+          }}
+        />
 
         <ContentLoader
           loading={false}
@@ -122,7 +126,7 @@ const LogIn = ({navigation}) => {
               resizeMode="contain"
             />
 
-            <Text style={styles.text}>Welcome to FlashMessage</Text>
+            <Text style={styles.text}>Welcome to Messenger</Text>
 
             <CustomInput
               placeholder="Email"
@@ -164,6 +168,7 @@ const LogIn = ({navigation}) => {
 
             {errors.password ? (
               <Text
+                // eslint-disable-next-line react-native/no-inline-styles
                 style={{
                   color: '#ff3333',
                   alignSelf: 'flex-start',
@@ -175,6 +180,7 @@ const LogIn = ({navigation}) => {
 
             {loginError ? (
               <Text
+                // eslint-disable-next-line react-native/no-inline-styles
                 style={{
                   backgroundColor: '#ffa00a',
                   color: '#fff',
@@ -186,29 +192,29 @@ const LogIn = ({navigation}) => {
               </Text>
             ) : null}
 
-            <CustomButton onPress={onLogInPressed} text="Log In" />
+            <CustomButton onPress={onLogInPressed} text="Đăng nhập" />
 
             <CustomButton
               onPress={onSignInFacebook}
-              text="Log In with Facebook"
+              text="Đăng nhập với Facebook"
               bgColor={colors.secondColor}
             />
 
             <CustomButton
               onPress={onSignInGoogle}
-              text="Log In with Google"
+              text="Đăng nhập với Google"
               bgColor={colors.redColor}
             />
 
             <CustomButton
               onPress={onForgotPasswordPressed}
-              text="Forgot Password?"
+              text="Quên mật khẩu?"
               type="TERTIARY"
             />
 
             <CustomButton
               onPress={onSignUp}
-              text="Don't have account? Create one"
+              text="Bạn không có tài khoản? Đăng ký"
               type="TERTIARY"
               fgColor={colors.secondColor}
             />

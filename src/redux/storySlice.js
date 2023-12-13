@@ -10,7 +10,7 @@ export const createStory = createAsyncThunk(
       const url = await uploadFile(content, type, token);
 
       const response = await postDataAPI(
-        `user/story`,
+        'user/story',
         {content: url, type: type},
         token,
       );

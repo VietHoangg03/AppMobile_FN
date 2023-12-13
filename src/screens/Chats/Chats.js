@@ -23,20 +23,21 @@ const Chats = ({navigation}) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    // eslint-disable-next-line no-shadow
     const loggedUser = users.filter(user => user._id === auth?.id)[0];
 
     setLoggedUser(loggedUser);
-  }, [users]);
+  }, [auth?.id, users]);
 
   const formatTime = time => {
     const dateConvert = new Date(time);
     const start = new Date(time).getTime();
     const end = new Date(Date.now()).getTime();
     const milliseconds = Math.abs(end - start).toString();
-    const seconds = parseInt(milliseconds / 1000);
-    const minutes = parseInt(seconds / 60);
-    const hours = parseInt(minutes / 60);
-    const days = parseInt(hours / 24);
+    const seconds = parseInt(milliseconds / 1000, 10);
+    const minutes = parseInt(seconds / 60, 10);
+    const hours = parseInt(minutes / 60, 10);
+    const days = parseInt(hours / 24, 10);
 
     if (days > 7) {
       const months = [
@@ -74,7 +75,7 @@ const Chats = ({navigation}) => {
 
   useEffect(() => {
     const getLastMess = async () => {
-      const res1 = await getDataAPI(`message/last`, auth.token);
+      const res1 = await getDataAPI('message/last', auth.token);
 
       const mapMess = conversations.map(e => e._id);
 

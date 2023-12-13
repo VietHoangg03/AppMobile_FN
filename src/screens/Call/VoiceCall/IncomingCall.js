@@ -19,7 +19,7 @@ const IncomingCall = ({join, hangup, remoteInfo}) => {
       }}
       style={styles.container}>
       {/* Header */}
-      <View style={styles.header}></View>
+      <View style={styles.header} />
 
       {/* Body */}
       {remoteInfo && (

@@ -29,4 +29,8 @@ export const styles = StyleSheet.create({
     width: 55,
     borderRadius: 50,
   },
+  addImageIcon: {
+    width: 40,
+    height: 40,
+  },
 });

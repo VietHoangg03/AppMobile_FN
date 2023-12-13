@@ -35,7 +35,7 @@ export const fetchSendMessage =
   (conversationId, senderId, msgType, content, token) => async dispatch => {
     try {
       const res = await postDataAPI(
-        `message/`,
+        'message/',
         {
           conversationId,
           senderId,

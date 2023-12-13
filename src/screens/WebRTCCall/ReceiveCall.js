@@ -2,7 +2,7 @@
 import React from 'react';
 import {View, StyleSheet, Text, Image, ImageBackground} from 'react-native';
 import {ButtonCall} from '@components/ButtonCall/ButtonCall';
-// import {axiosAuth, getAvatarUrl} from '@libs';
+import {axiosAuth, getAvatarUrl} from '@libs';
 
 export default function ReceiveCall({join, hangup, remoteInfo}) {
   return (

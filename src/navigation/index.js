@@ -17,7 +17,7 @@ import Chat from '@screens/Chats/Stacks/Chat/Chat';
 import Chats from '@screens/Chats/Chats';
 import People from '@screens/People/People';
 import Discover from '@screens/Discover/Discover';
-import Camera from '@screens/Camera/Camera';
+//import Camera from '@screens/Camera/Camera';
 import ConversationSettings from '@screens/Chats/Stacks/Convesation/ConversationSettings';
 import EditProfile from '@screens/Profile/EditProfile/EditProfile';
 import Story from '@components/Story/Story';
@@ -26,6 +26,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {colors} from '@theme/colors';
 import {getUsers} from '@redux/userSlice';
+
+// import IncomingCall from '@screens/Call/VoiceCall/IncomingCall';
+// import OutgoingCall from '@screens/Call/VoiceCall/OutgoingCall';
 
 const Stack = createStackNavigator();
 
@@ -61,7 +64,7 @@ const Home = ({navigation}) => {
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
-        tabBarIcon: ({focused, color, size}) => {
+        tabBarIcon: ({focused}) => {
           let iconName;
           let icon = false;
 
@@ -99,6 +102,7 @@ const Home = ({navigation}) => {
 
           // You can return any component that you like here!
           return icon ? (
+            // eslint-disable-next-line react-native/no-inline-styles
             <FontAwesome name={iconName} style={{fontSize: 24}} />
           ) : (
             iconName
@@ -231,13 +235,13 @@ export const RootNavigator = () => {
         }}
       />
 
-      <Stack.Screen
+      {/* <Stack.Screen
         name="Camera"
         component={Camera}
         options={{
           headerShown: false,
         }}
-      />
+      /> */}
       <Stack.Screen
         name="ConversationSettings"
         component={ConversationSettings}
@@ -279,7 +283,7 @@ export const RootNavigator = () => {
         options={{
           headerShown: false,
         }}
-      /> */}
+        />*/}
     </Stack.Navigator>
   );
 };

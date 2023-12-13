@@ -13,9 +13,9 @@ import React, {useEffect, useRef, useState} from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import {ButtonCall} from '@components/ButtonCall/ButtonCall';
 import ReceiveCall from './ReceiveCall';
-// import {axiosAuth, getAvatarUrl, socket} from '@libs';
+import {axiosAuth, getAvatarUrl} from '@libs';
 import {useDispatch, useSelector} from 'react-redux';
-// import {Avatar, Spinner} from 'native-base';
+import {Avatar, Spinner} from 'native-base';
 import {socket} from '@utils/socket';
 
 const configuration = {

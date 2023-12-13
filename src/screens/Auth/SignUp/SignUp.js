@@ -139,13 +139,13 @@ const SignUp = ({navigation}) => {
       !errors.lastName &&
       !errors.confirmPassword
     ) {
-      // const res = await postDataAPI('auth/register', info);
+      const res = await postDataAPI('auth/register', info);
 
-      // dispatch(addUser(res.data.user));
+      dispatch(addUser(res.data.user));
 
-      // await AsyncStorage.setItem('@user_token', res.data.access_token);
+      await AsyncStorage.setItem('@user_token', res.data.access_token);
 
-      // navigation.navigate('Home', {token: res.data.access_token});
+      navigation.navigate('Home', {token: res.data.access_token});
 
       dispatch(register(info));
 

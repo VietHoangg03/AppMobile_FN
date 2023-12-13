@@ -14,7 +14,6 @@ export const getDataAPI = async (url, token) => {
 
 export const postDataAPI = async (url, data, token) => {
   try {
-    console.log(url, data);
     const res = await instance.post(url, data, {
       headers: {Authorization: token},
     });

@@ -13,11 +13,7 @@ const DiscoverList = ({data}) => {
       </View>
     </View>
   );
-  return (
-    <View>
-      {data.map(item => renderItem({item}))}
-    </View>
-  );
+  return <View>{data.map(item => renderItem({item}))}</View>;
 };
 
 export default DiscoverList;

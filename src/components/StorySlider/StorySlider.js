@@ -67,8 +67,7 @@ const StorySlider = ({navigation, loggedUser}) => {
       <TouchableOpacity
         style={styles.userIconContainer}
         onPress={handlePickerAvatar}>
-        <Feather style={{fontSize: 60}} name="plus" />
-
+        <Image style={styles.addImageIcon} source={images.your_story00} />
         <Text style={styles.userName}>Add Story</Text>
       </TouchableOpacity>
 

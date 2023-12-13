@@ -70,7 +70,7 @@ const SearchBox = ({userStore, navigation}) => {
           value={search}
           style={styles.searchInput}
           onChangeText={text => setSearch(text)}
-          placeholder="Search"
+          placeholder="Tìm kiếm"
         />
         {users.length > 0 && (
           <Ionicons

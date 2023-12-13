@@ -1,5 +1,6 @@
 import React from 'react';
 import {TouchableOpacity, Image, StyleSheet, StatusBar} from 'react-native';
+import {images} from '@images';
 
 export default function BackButton({goBack}) {
   return (

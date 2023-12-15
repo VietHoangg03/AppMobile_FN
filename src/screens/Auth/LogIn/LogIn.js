@@ -12,6 +12,7 @@ import {useReveal} from '@hooks/useReveal';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {validateEmail, validatePassword} from '@utils/validate';
 import ContentLoader from 'react-native-easy-content-loader';
+import {setAlert} from '@redux/alertSlice';
 
 const LogIn = ({navigation}) => {
   const dispatch = useDispatch();
@@ -43,6 +44,7 @@ const LogIn = ({navigation}) => {
   };
 
   useEffect(() => {
+    dispatch(setAlert({type: 'login', msg: ''}));
     if (auth?.token) {
       navigation.navigate('Home');
     }
@@ -97,20 +99,6 @@ const LogIn = ({navigation}) => {
         style={{
           paddingTop: 12,
         }}>
-        <ContentLoader
-          loading={false}
-          active
-          avatar
-          pRows={0}
-          tHeight={40}
-          tWidth={340}
-          aSize={40}
-          // eslint-disable-next-line react-native/no-inline-styles
-          containerStyles={{
-            marginBottom: 10,
-          }}
-        />
-
         <ContentLoader
           loading={false}
           active

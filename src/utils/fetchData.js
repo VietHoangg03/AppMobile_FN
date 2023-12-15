@@ -13,15 +13,11 @@ export const getDataAPI = async (url, token) => {
 };
 
 export const postDataAPI = async (url, data, token) => {
-  try {
-    const res = await instance.post(url, data, {
-      headers: {Authorization: token},
-    });
+  const res = await instance.post(url, data, {
+    headers: {Authorization: token},
+  });
 
-    return res;
-  } catch (err) {
-    console.log(err);
-  }
+  return res;
 };
 
 export const putDataAPI = async (url, data, token) => {

@@ -41,7 +41,6 @@ export const login = createAsyncThunk(
 
       return res.data;
     } catch (err) {
-      console.log(err);
       dispatch(setLoading(false));
       const {data} = err.response;
       if (data && data.msg) {

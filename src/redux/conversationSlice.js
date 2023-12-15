@@ -45,9 +45,8 @@ const conversationSlice = createSlice({
 export const fetchConversations = (userId, token) => async dispatch => {
   try {
     const res = await getDataAPI(`conversation/user/${userId}`, token);
-
     const conversations = [];
-    if (res.status === 200) {
+    if (res.status === 200 && res.data.conversations) {
       // Change title of Conversations whose title = '1vs1' into peerName
 
       for (const conversation of res.data.conversations) {
@@ -73,20 +72,20 @@ export const fetchConversations = (userId, token) => async dispatch => {
         }
       }
 
-      // const res1 = await getDataAPI(`message/last`, token);
+      const res1 = await getDataAPI(`message/last`, token);
 
-      // const {lastMessages} = res1.data;
+      const {lastMessages} = res1.data;
 
-      // const mapMess = res.data.conversations.map(e => e._id);
+      const mapMess = res.data.conversations?.map(e => e._id);
 
-      // const lastMess = lastMessages
-      //   .filter(mess => mapMess.includes(mess._id))
-      //   .map(e => ({
-      //     ...e,
-      //     createdAt: moment(e.createdAt).format('HH:mm'),
-      //   }));
+      const lastMess = lastMessages
+        .filter(mess => mapMess.includes(mess._id))
+        .map(e => ({
+          ...e,
+          createdAt: moment(e.createdAt).format('HH:mm'),
+        }));
 
-      // dispatch(setLastMessages(lastMess));
+      dispatch(setLastMessages(lastMess));
 
       dispatch(getConversations(conversations));
     } else {

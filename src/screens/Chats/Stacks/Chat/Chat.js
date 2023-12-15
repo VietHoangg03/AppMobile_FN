@@ -12,7 +12,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import EmojiSelector from 'react-native-emoji-selector';
 
 // import * as ImagePicker from "expo-image-picker";
-import {launchImageLibrary} from 'react-native-image-picker';
+import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
 import Video from 'react-native-video';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -31,8 +31,7 @@ import {socket} from '@utils/socket';
 const Chat = ({navigation, route}) => {
   const [messageList, setMessageList] = useState([]);
   const [text, setText] = useState('');
-  const [image, setImage] = useState(null);
-  const [videoUri, setVideoUri] = useState(null);
+  const [media, setMedia] = useState(null);
   const [showEmoji, setShowEmoji] = useState(false);
   const video = useRef(null);
   const scrollViewRef = useRef();
@@ -164,53 +163,74 @@ const Chat = ({navigation, route}) => {
     setText(appendEmoji);
   };
 
-  const pickImage = async () => {
-    const result = await launchImageLibrary({});
-
-    const uri = result.assets[0].uri;
-
-    if (!result.didCancel) {
-      setImage(uri);
-      console.log(uri);
-    }
-  };
-
-  const onSendImage = async () => {
-    const tempImage = image;
-    setImage(null);
-
-    const imageUrl = await uploadFile(tempImage, 'image', token);
-
-    const messageData = {
-      room: current_conversation._id,
-      userName: current_conversation.title,
-      idUser: auth.id,
-      avatar: current_conversation.avatar,
-      type: enumMessenger.msgType.image,
-      message: imageUrl,
-      time:
-        new Date(Date.now()).getHours() +
-        ':' +
-        new Date(Date.now()).getMinutes(),
+  const pickMedia = async () => {
+    const options = {
+      quality: 1.0,
+      maxWidth: 500,
+      maxHeight: 500,
+      mediaType: 'mixed',
     };
 
-    socket.emit('send_message', {messageData});
-    setMessageList([...messageList, messageData]);
+    launchImageLibrary(options, response => {
+      if (response.didCancel) {
+        console.log('User cancelled photo picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else {
+        let source = response.assets[0];
+        if (source.type === 'video/mp4') {
+          setMedia({
+            source: source,
+            type: 'video',
+          });
+        } else {
+          setMedia({
+            source: source,
+            type: 'image',
+          });
+        }
+      }
+    });
   };
 
-  const onSendVideo = async () => {
-    const tempVideoUri = videoUri;
-    setVideoUri(null);
+  const handleDeviceMedia = type => {
+    launchCamera(
+      {
+        mediaType: type,
+        includeBase64: false,
+        maxHeight: 200,
+        maxWidth: 200,
+      },
+      response => {
+        if (response.didCancel) {
+          console.log('User cancelled photo picker');
+        } else if (response.error) {
+          console.log('ImagePicker Error: ', response.error);
+        } else {
+          let source = response.assets[0];
+          setMedia({
+            source: source,
+            type: type,
+          });
+        }
+      },
+    );
+  };
 
-    const videoUrl = await uploadFile(tempVideoUri, 'video', token);
+  const onSendMedia = async () => {
+    const mediaUrl = await uploadFile(media.source);
+    setMedia(null);
 
     const messageData = {
       room: current_conversation._id,
       userName: current_conversation.title,
       idUser: auth.id,
       avatar: current_conversation.avatar,
-      type: enumMessenger.msgType.file,
-      message: videoUrl,
+      type:
+        media.type === 'image'
+          ? enumMessenger.msgType.image
+          : enumMessenger.msgType.file,
+      message: mediaUrl,
       time:
         new Date(Date.now()).getHours() +
         ':' +
@@ -321,18 +341,15 @@ const Chat = ({navigation, route}) => {
 
         {/* Camera button */}
         <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('Camera', {
-              setImage,
-              setVideoUri,
-            })
-          }
+          onPress={() => handleDeviceMedia('image')}
           style={styles.iconFooter}>
           <Image source={images.camera_button} style={styles.camera_button} />
         </TouchableOpacity>
 
         {/* Picture/Photo button */}
-        <TouchableOpacity onPress={pickImage} style={styles.iconFooter}>
+        <TouchableOpacity
+          onPress={() => pickMedia('image')}
+          style={styles.iconFooter}>
           <Image source={images.image_button} style={styles.image_button} />
         </TouchableOpacity>
 
@@ -389,21 +406,23 @@ const Chat = ({navigation, route}) => {
           </TouchableOpacity>
         )}
         {/* ... */}
-        {image && (
+        {media?.type === 'image' && media?.source && (
           <View style={styles.preview}>
             <TouchableOpacity
               style={styles.previewClose}
-              onPress={() => setImage(null)}>
+              onPress={() => setMedia(null)}>
               <AntDesign
                 name="close"
                 style={{color: colors.white, fontSize: 20}}
               />
             </TouchableOpacity>
             <Image
-              source={{uri: image} || images.avatar}
+              source={{uri: media?.source.uri}}
               style={styles.previewImg}
             />
-            <TouchableOpacity style={styles.previewSend} onPress={onSendImage}>
+            <TouchableOpacity
+              style={styles.previewSend}
+              onPress={() => onSendMedia('image')}>
               <Text style={{color: colors.white}}>Send</Text>
               <Ionicons
                 name="send"
@@ -414,11 +433,11 @@ const Chat = ({navigation, route}) => {
         )}
 
         {/* ... */}
-        {videoUri && (
+        {media?.type === 'video' && media?.source && (
           <View style={styles.preview}>
             <TouchableOpacity
               style={styles.previewClose}
-              onPress={() => setVideoUri(null)}>
+              onPress={() => setMedia(null)}>
               <AntDesign
                 name="close"
                 style={{color: colors.white, fontSize: 20}}
@@ -428,13 +447,15 @@ const Chat = ({navigation, route}) => {
               ref={video}
               style={styles.previewVideo}
               source={{
-                uri: videoUri,
+                uri: media?.source.uri,
               }}
               // useNativeControls
               // resizeMode="contain"
               // isLooping
             />
-            <TouchableOpacity style={styles.previewSend} onPress={onSendVideo}>
+            <TouchableOpacity
+              style={styles.previewSend}
+              onPress={() => onSendMedia('image')}>
               <Text style={{color: colors.white}}>Send</Text>
               <Ionicons
                 name="send"

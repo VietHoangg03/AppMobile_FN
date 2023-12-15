@@ -199,7 +199,7 @@ const Story = ({navigation, route}) => {
   async function handleAddStory() {
     const result = await launchImageLibrary({});
 
-    const uri = result.assets[0].uri;
+    const uri = result.assets[0];
 
     if (!result.didCancel) {
       dispatch(

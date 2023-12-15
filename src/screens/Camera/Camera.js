@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {View, Text, TouchableOpacity, Dimensions} from 'react-native';
-import {RNCamera} from 'react-native-camera';
+// import {RNCamera} from 'react-native-camera';
 // import { Audio } from "expo-av";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
@@ -64,6 +64,7 @@ export default function Camera({navigation, route}) {
   return (
     <View style={styles.container}>
       <RNCamera
+        captureAudio={false}
         style={styles.camera}
         type={'Back'}
         ref={ref => setCamera(ref)}

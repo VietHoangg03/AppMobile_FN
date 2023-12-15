@@ -17,7 +17,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useDispatch, useSelector} from 'react-redux';
 import Story from '@components/Story/Story';
-import {launchImageLibrary} from 'react-native-image-picker';
+// import {launchImageLibrary} from 'react-native-image-picker';
 import {
   setConversations,
   setCurrentConversation,
@@ -91,20 +91,18 @@ const Profile = ({navigation, route}) => {
   };
 
   async function handleAddStory() {
-    const result = await launchImageLibrary({});
-
-    const uri = result.assets[0].uri;
-
-    if (!result.didCancel) {
-      dispatch(
-        createStory({
-          userId: auth.id,
-          content: uri,
-          type: 'image',
-          token: auth.token,
-        }),
-      );
-    }
+    // const result = await launchImageLibrary({});
+    // const uri = result.assets[0].uri;
+    // if (!result.didCancel) {
+    //   dispatch(
+    //     createStory({
+    //       userId: auth.id,
+    //       content: uri,
+    //       type: 'image',
+    //       token: auth.token,
+    //     }),
+    //   );
+    // }
   }
 
   return (
@@ -120,7 +118,7 @@ const Profile = ({navigation, route}) => {
         />
 
         <Image
-          source={{uri: user.wallpaper} || images.wallpaper}
+          source={{uri: user?.wallpaper} || images.wallpaper}
           style={styles.coverPhoto}
         />
 

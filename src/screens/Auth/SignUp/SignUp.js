@@ -1,5 +1,5 @@
 import {View, Text, Image, ScrollView, Pressable} from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {styles} from './SignUp.styles';
 import {images} from '@images/index';
 import {colors} from '@theme/colors';
@@ -21,6 +21,7 @@ import {
   validateName,
   validatePassword,
 } from '@utils/validate';
+import {setAlert} from '@redux/alertSlice';
 
 const SignUp = ({navigation}) => {
   const [info, setInfo] = useState({
@@ -52,7 +53,7 @@ const SignUp = ({navigation}) => {
   } = useReveal();
 
   const dispatch = useDispatch();
-  const error = useSelector(state => state.alert?.error);
+  const error = useSelector(state => state.alert?.registerError);
 
   const radioButtonsData = [
     {
@@ -139,19 +140,25 @@ const SignUp = ({navigation}) => {
       !errors.lastName &&
       !errors.confirmPassword
     ) {
-      const res = await postDataAPI('auth/register', info);
+      try {
+        const res = await postDataAPI('auth/register', info);
 
-      dispatch(addUser(res.data.user));
+        await AsyncStorage.setItem('@user_token', res.data.access_token);
 
-      await AsyncStorage.setItem('@user_token', res.data.access_token);
+        navigation.navigate('Home', {token: res.data.access_token});
 
-      navigation.navigate('Home', {token: res.data.access_token});
+        dispatch(register(info));
 
-      dispatch(register(info));
-
-      navigation.navigate('Home');
+        navigation.navigate('Home');
+      } catch (e) {
+        dispatch(setAlert({type: 'register', msg: e.response.data.msg}));
+      }
     }
   };
+
+  useEffect(() => {
+    dispatch(setAlert({type: 'register', msg: ''}));
+  }, []);
 
   const validate = {
     email: function (email) {
@@ -255,7 +262,7 @@ const SignUp = ({navigation}) => {
       />
 
       <CustomInput
-        placeholder="First Name"
+        placeholder="First Name *"
         value={info.firstName}
         setValue={text => handleData('firstName', text)}
         handleBlur={e => {
@@ -270,7 +277,7 @@ const SignUp = ({navigation}) => {
       ) : null}
 
       <CustomInput
-        placeholder="Last Name"
+        placeholder="Last Name *"
         value={info.lastName}
         setValue={text => handleData('lastName', text)}
         handleBlur={e => {
@@ -285,7 +292,7 @@ const SignUp = ({navigation}) => {
       ) : null}
 
       <CustomInput
-        placeholder="Email"
+        placeholder="Email *"
         value={info.email}
         setValue={text => handleData('email', text)}
         handleBlur={e => {
@@ -301,7 +308,7 @@ const SignUp = ({navigation}) => {
 
       <View style={styles.inputContainer}>
         <CustomInput
-          placeholder="Password"
+          placeholder="Password *"
           value={info.password}
           setValue={text => handleData('password', text)}
           secureTextEntry={passwordVisibility ? true : false}
@@ -325,7 +332,7 @@ const SignUp = ({navigation}) => {
 
       <View style={styles.inputContainer}>
         <CustomInput
-          placeholder="Confirm password"
+          placeholder="Confirm password *"
           value={info.confirmPassword}
           setValue={text => handleData('confirmPassword', text)}
           secureTextEntry={confirmPasswordVisibility ? true : false}
@@ -350,7 +357,7 @@ const SignUp = ({navigation}) => {
       ) : null}
 
       <CustomInput
-        placeholder="Date of birth"
+        placeholder="Date of birth (MM/DD/YYYY) *"
         value={info.dateOfBirth}
         setValue={text => handleData('dateOfBirth', text)}
         handleBlur={e => {

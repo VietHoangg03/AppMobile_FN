@@ -17,7 +17,7 @@ import Chat from '@screens/Chats/Stacks/Chat/Chat';
 import Chats from '@screens/Chats/Chats';
 import People from '@screens/People/People';
 import Discover from '@screens/Discover/Discover';
-//import Camera from '@screens/Camera/Camera';
+// import Camera from '@screens/Camera/Camera';
 import ConversationSettings from '@screens/Chats/Stacks/Convesation/ConversationSettings';
 import EditProfile from '@screens/Profile/EditProfile/EditProfile';
 import Story from '@components/Story/Story';
@@ -234,7 +234,6 @@ export const RootNavigator = () => {
           headerShown: false,
         }}
       />
-
       {/* <Stack.Screen
         name="Camera"
         component={Camera}

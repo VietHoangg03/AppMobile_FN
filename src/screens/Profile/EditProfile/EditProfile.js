@@ -31,9 +31,9 @@ const EditProfile = ({navigation, route}) => {
   const dispatch = useDispatch();
 
   const auth = useSelector(state => state.auth);
-  const alert = useSelector(state => state.alert);
   const [infoTemp, setInfoTemp] = useState(user);
   const [info, setInfo] = useState(user);
+  console.log(user);
   const [modalVisible, setModalVisible] = useState({
     information: false,
     bio: false,
@@ -61,15 +61,13 @@ const EditProfile = ({navigation, route}) => {
 
   const handlePickerAvatar = async type => {
     const result = await launchImageLibrary({});
-
-    const uri = result.assets[0].uri;
-
+    const uri = result.assets[0];
     if (!result.didCancel) {
       if (type === 'avatar') {
-        setInfo({...info, avatar: uri});
+        setInfo({...info, avatar: uri.uri, avatarTemp: uri});
         // dispatch(editAttributeUser({ type: "avatar", data: uri }));
       } else if (type === 'wallpaper') {
-        setInfo({...info, wallpaper: uri});
+        setInfo({...info, wallpaper: uri.uri, wallpaperTemp: uri});
         // dispatch(editAttributeUser({ type: "wallpaper", data: uri }));
       }
     }
@@ -119,11 +117,15 @@ const EditProfile = ({navigation, route}) => {
     }
 
     if (info.avatar !== user.avatar) {
-      newInfo.avatar = await uploadFile(info.avatar, 'image', auth.token);
+      newInfo.avatar = await uploadFile(info.avatarTemp, 'image', auth.token);
     }
 
     if (info.wallpaper !== user.wallpaper) {
-      newInfo.wallpaper = await uploadFile(info.wallpaper, 'image', auth.token);
+      newInfo.wallpaper = await uploadFile(
+        info.wallpaperTemp,
+        'image',
+        auth.token,
+      );
     }
 
     dispatch(

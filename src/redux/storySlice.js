@@ -7,7 +7,7 @@ export const createStory = createAsyncThunk(
   'user/createStory',
   async ({userId, content, type, token}, {rejectWithValue, dispatch}) => {
     try {
-      const url = await uploadFile(content, type, token);
+      const url = await uploadFile(content);
 
       const response = await postDataAPI(
         'user/story',

@@ -15,8 +15,6 @@ const GroupMembers = ({route, navigation}) => {
   const {members} = route.params;
   const users = useSelector(state => state.user.users);
 
-  console.log('MEMBERS >>>', members);
-
   const memberUsers = useMemo(() => {
     let membersUser = [];
     members.forEach(member => {

@@ -32,6 +32,7 @@ const Chat = ({navigation, route}) => {
   const [messageList, setMessageList] = useState([]);
   const [text, setText] = useState('');
   const [media, setMedia] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [showEmoji, setShowEmoji] = useState(false);
   const video = useRef(null);
   const scrollViewRef = useRef();
@@ -50,7 +51,6 @@ const Chat = ({navigation, route}) => {
 
   // console.log("Message list: ", messageList);
 
-  const {token} = useSelector(state => state.auth);
   const dispatch = useDispatch();
 
   const sendUser = useMemo(() => {
@@ -87,6 +87,29 @@ const Chat = ({navigation, route}) => {
       isVideoCall: false,
     });
   };
+
+  useEffect(() => {
+    const messageData = {
+      room: current_conversation._id,
+      userName: sendUser?.firstName,
+      idUser: auth.id,
+      avatar: sendUser.avatar,
+      type: enumMessenger.msgType.callOff,
+      message: 'call_off',
+      time:
+        new Date(Date.now()).getHours() +
+        ':' +
+        new Date(Date.now()).getMinutes(),
+    };
+
+    socket.on('video-call-stop', ({sender, receiver, conversationId}) => {
+      socket.emit('send_message', {
+        messageData,
+        currentCon: current_conversation,
+      });
+    });
+    setMessageList([...messageList, messageData]);
+  }, [current_conversation, socket, auth]);
 
   const sendMessage = (sendLikeIcon = false) => {
     if (showEmoji) {
@@ -152,11 +175,12 @@ const Chat = ({navigation, route}) => {
       }
     };
     socket.on('receive_message', handler);
+    setLoading(false);
 
     return () => {
       socket.off('receive_message', handler);
     };
-  }, [socket, messageList]);
+  }, [socket, current_conversation, messageList]);
 
   const handleText = emoji => {
     const appendEmoji = text + emoji;
@@ -280,7 +304,22 @@ const Chat = ({navigation, route}) => {
               <Text style={{fontSize: 16, fontWeight: 'bold', color: 'black'}}>
                 {current_conversation.title}
               </Text>
-              <Text style={{fontSize: 12}}>Status</Text>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
+                <View
+                  style={{
+                    width: 5,
+                    height: 5,
+                    borderRadius: 100,
+                    backgroundColor: '#267b00',
+                    marginRight: 5,
+                  }}></View>
+                <Text style={{fontSize: 12}}>Online</Text>
+              </View>
             </View>
           </TouchableOpacity>
         </View>
@@ -302,36 +341,40 @@ const Chat = ({navigation, route}) => {
 
       {/* style={[styles.message, username === messageContent.userName ? "you" : "other"]} */}
       {/* Body a.k.a List of messages */}
-      <View style={styles.body}>
-        <ScrollView
-          style={styles.messageContainer}
-          ref={scrollViewRef}
-          onContentSizeChange={() =>
-            scrollViewRef.current.scrollToEnd({animated: true})
-          }>
-          {messageList.map((messageContent, index) =>
-            messageContent.idUser === auth.id ? (
-              <RightMessage
-                key={index}
-                type={messageContent.type}
-                message={messageContent.message}
-                time={messageContent.time}
-                userName={messageContent.userName}
-                avatar={messageContent.avatar}
-              />
-            ) : (
-              <LeftMessage
-                key={index}
-                type={messageContent.type}
-                message={messageContent.message}
-                time={messageContent.time}
-                userName={messageContent.userName}
-                avatar={messageContent.avatar}
-              />
-            ),
-          )}
-        </ScrollView>
-      </View>
+      {loading ? (
+        <Text>Loading...</Text>
+      ) : (
+        <View style={styles.body}>
+          <ScrollView
+            style={styles.messageContainer}
+            ref={scrollViewRef}
+            onContentSizeChange={() =>
+              scrollViewRef.current.scrollToEnd({animated: true})
+            }>
+            {messageList.map((messageContent, index) =>
+              messageContent.idUser === auth.id ? (
+                <RightMessage
+                  key={index}
+                  type={messageContent.type}
+                  message={messageContent.message}
+                  time={messageContent.time}
+                  userName={messageContent.userName}
+                  avatar={messageContent.avatar}
+                />
+              ) : (
+                <LeftMessage
+                  key={index}
+                  type={messageContent.type}
+                  message={messageContent.message}
+                  time={messageContent.time}
+                  userName={messageContent.userName}
+                  avatar={messageContent.avatar}
+                />
+              ),
+            )}
+          </ScrollView>
+        </View>
+      )}
 
       <View style={styles.footer}>
         {/* Grid a.k.a four points */}
@@ -396,9 +439,10 @@ const Chat = ({navigation, route}) => {
             <Image source={images.like_button} style={styles.like_button} />
           </TouchableOpacity>
         )}
+        {/* a.k.a Call off */}
 
         {/* a.k.a Send button */}
-        {text !== '' && (
+        {text !== '' && text !== 'call_off' && (
           <TouchableOpacity
             onPress={() => sendMessage(false)}
             style={styles.iconFooter}>

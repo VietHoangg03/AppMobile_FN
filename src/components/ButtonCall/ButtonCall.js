@@ -6,7 +6,7 @@ export function ButtonCall({style, onPress, backgroundColor, iconName}) {
   return (
     <View>
       <TouchableOpacity
-        onPress={onPress}
+        onPress={() => onPress(true)}
         style={[{backgroundColor: backgroundColor}, style, styles.button]}>
         <MaterialIcons name={iconName} size={20} color="#fff" />
       </TouchableOpacity>

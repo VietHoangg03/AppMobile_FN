@@ -105,6 +105,12 @@ const UserListing = ({navigation, lastMessages}) => {
       } else {
         return item + ' send a like';
       }
+    } else if (last.msgType === 4) {
+      if (last.senderId === auth.id) {
+        return 'You ended the call';
+      } else {
+        return item + ' ended the call';
+      }
     } else {
       return last.content;
     }

@@ -17,15 +17,34 @@ import {axiosAuth, getAvatarUrl} from '@libs';
 import {useDispatch, useSelector} from 'react-redux';
 import {Avatar, Spinner} from 'native-base';
 import {socket} from '@utils/socket';
+import {enumMessenger} from '@utils/enum';
 
 const configuration = {
   iceServers: [
-    // {url: 'stun:stun.stunprotocol.org:3478'},
-    {url: 'stun:stun.l.google.com:19302'},
     {
-      url: 'turn:numb.viagenie.ca',
-      credential: 'muazkh',
-      username: 'webrtc@live.com',
+      url: 'stun:global.stun.twilio.com:3478',
+      urls: 'stun:global.stun.twilio.com:3478',
+    },
+    {
+      credential: 'in+FMPx/YBAAuj2gCiDNRSXMrmF7kC0xquDwJ0j8GfU=',
+      url: 'turn:global.turn.twilio.com:3478?transport=udp',
+      urls: 'turn:global.turn.twilio.com:3478?transport=udp',
+      username:
+        '8006c4f4272772da8d5ab46e6f45afbc26fcd1951b345cd2493a2cdd5c983fab',
+    },
+    {
+      credential: 'in+FMPx/YBAAuj2gCiDNRSXMrmF7kC0xquDwJ0j8GfU=',
+      url: 'turn:global.turn.twilio.com:3478?transport=tcp',
+      urls: 'turn:global.turn.twilio.com:3478?transport=tcp',
+      username:
+        '8006c4f4272772da8d5ab46e6f45afbc26fcd1951b345cd2493a2cdd5c983fab',
+    },
+    {
+      credential: 'in+FMPx/YBAAuj2gCiDNRSXMrmF7kC0xquDwJ0j8GfU=',
+      url: 'turn:global.turn.twilio.com:443?transport=tcp',
+      urls: 'turn:global.turn.twilio.com:443?transport=tcp',
+      username:
+        '8006c4f4272772da8d5ab46e6f45afbc26fcd1951b345cd2493a2cdd5c983fab',
     },
   ],
 };
@@ -72,13 +91,16 @@ export function WebRTCCall({route, navigation}) {
 
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
-  const [receivingCall, setReceivingCall] = useState(!isCaller);
+  const [receivingCall, setReceivingCall] = useState(false);
   const [isMic, setIsMic] = useState(true);
   const [isCamera, setIsCamera] = useState(isVideoCall);
   const [isRemoteMic, setIsRemoteMic] = useState(true);
   const [isRemoteCamera, setIsRemoteCamera] = useState(isVideoCall);
   const [remoteInfo, setRemoteInfo] = useState(receiver);
+  const [countDown, setCountDown] = React.useState(0);
+  const [runTimer, setRunTimer] = React.useState(false);
   const pc = useRef();
+  const auth = useSelector(state => state.auth);
   const dispatch = useDispatch();
 
   // useEffect(() => {
@@ -94,6 +116,19 @@ export function WebRTCCall({route, navigation}) {
   // }, [isCaller]);
 
   useEffect(() => {
+    // let timerId;
+
+    // if (runTimer) {
+    //   setCountDown(60 * 5);
+    //   timerId = setInterval(() => {
+    //     setCountDown(countDown => countDown - 1);
+    //   }, 1000);
+    // } else {
+    //   clearInterval(timerId);
+    // }
+
+    pc.current = new RTCPeerConnection(configuration);
+
     if (isCaller) {
       create();
     }
@@ -104,10 +139,8 @@ export function WebRTCCall({route, navigation}) {
 
     socket.on('video-call-answer', async ({sender, receiver, answer}) => {
       try {
-        if (pc.current && answer && !pc.current.remoteDescription) {
-          const test = pc.current.setRemoteDescription(
-            new RTCSessionDescription(answer),
-          );
+        if (pc.current && answer) {
+          pc.current.setRemoteDescription(new RTCSessionDescription(answer));
         }
       } catch (error) {
         console.log('remote error', error);
@@ -127,8 +160,31 @@ export function WebRTCCall({route, navigation}) {
 
     return () => {
       cleanUp();
+      // clearInterval(timerId);
     };
   }, [socket]);
+
+  // React.useEffect(() => {
+  //   if (countDown < 0 && runTimer) {
+  //     console.log('expired');
+  //     setRunTimer(false);
+  //     setCountDown(0);
+  //   }
+  //   socket.emit('video-call-stop', {
+  //     sender: sender,
+  //     receiver: receiver,
+  //     conversationId: conversationId,
+  //     isCaller: isCaller,
+  //   });
+  //   navigation.navigate('Chat');
+  // }, [countDown, runTimer]);
+
+  useEffect(() => {
+    socket.on('video-call-candidate', ({sender, receiver, candidate}) => {
+      pc.current.addIceCandidate(new RTCIceCandidate(candidate));
+      setReceivingCall(true);
+    });
+  }, [pc.current]);
 
   const sendToPeer = (messageType, payload) => {
     socket.emit(messageType, {
@@ -140,20 +196,32 @@ export function WebRTCCall({route, navigation}) {
   };
 
   const setupWebrtc = async () => {
-    pc.current = new RTCPeerConnection(configuration);
-    const stream = await getStream();
-    setLocalStream(stream);
+    try {
+      const local = await mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+      setLocalStream(local);
 
-    console.log('LOCAL received the stream call', stream);
+      // local.getTracks().forEach(track => {
+      //   pc.current.getLocalStream()[0].addTrack(track);
+      // });
+      local.getTracks().forEach(track => {
+        pc.current.addTrack(track, local);
+      });
 
-    pc.current.addStream(stream);
-
-    pc.current.onaddstream = e => {
-      if (e.stream && remoteStream !== e.stream) {
-        console.log('RemotePC received the stream call', e.stream);
-        setRemoteStream(e.stream);
-      }
-    };
+      // pc.current.onaddstream = event => {
+      //   setRemoteStream(event.stream);
+      // };
+      pc.current.ontrack = event => {
+        setRemoteStream(event.streams[0]);
+        // event.streams[0].getTracks().forEach(track => {
+        //   pc.current.addTrack(track, event.streams[0]);
+        // });
+      };
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const collectIceCandidates = () => {
@@ -204,7 +272,7 @@ export function WebRTCCall({route, navigation}) {
 
         collectIceCandidates();
 
-        if (pc.current && !pc.current.localDescription && offer) {
+        if (offer) {
           const test = pc.current.setRemoteDescription(
             new RTCSessionDescription(offer),
           );
@@ -221,12 +289,29 @@ export function WebRTCCall({route, navigation}) {
   const hangup = () => {
     cleanUp();
 
+    // const messageData = {
+    //   room: conversationId,
+    //   userName: sender?.firstName,
+    //   idUser: auth.id,
+    //   avatar: sender.avatar,
+    //   type: enumMessenger.msgType.callOff,
+    //   message: 'call_cancel',
+    //   time:
+    //     new Date(Date.now()).getHours() +
+    //     ':' +
+    //     new Date(Date.now()).getMinutes(),
+    // };
+
     socket.emit('video-call-stop', {
       sender: sender,
       receiver: receiver,
       conversationId: conversationId,
       isCaller: isCaller,
     });
+
+    // socket.emit('send_message', {
+    //   messageData,
+    // });
     navigation.navigate('Chat');
   };
 
@@ -298,7 +383,7 @@ export function WebRTCCall({route, navigation}) {
               width: '100%',
               height: '100%',
             }}
-            streamURL={localStream && localStream.toURL()}
+            streamURL={localStream ? localStream.toURL() : null}
           />
         )}
       </View>
@@ -351,7 +436,7 @@ export function WebRTCCall({route, navigation}) {
               width: '100%',
               height: '100%',
             }}
-            streamURL={localStream && localStream.toURL()}
+            streamURL={localStream ? localStream.toURL() : null}
           />
         )}
         <View style={styles.mediaStyle}>
@@ -383,7 +468,7 @@ export function WebRTCCall({route, navigation}) {
         <ButtonCall
           iconName="call-end"
           backgroundColor="red"
-          onPress={hangup}
+          onPress={cancel => hangup(cancel)}
         />
       </View>
     </View>

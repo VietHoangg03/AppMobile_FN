@@ -13,8 +13,6 @@ export default function ConversationSettings({route, navigation}) {
   const avatar = route.params.avatar;
   const {username, status, receiveUser, members} = route.params.userInfo;
 
-  console.log('MEMBERS >>>>', members);
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>

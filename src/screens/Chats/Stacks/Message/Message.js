@@ -7,6 +7,8 @@ import VideoPlayer from 'react-native-video-controls';
 import {styles} from './Message.styles';
 import {images} from '@images';
 import {enumMessenger} from '@utils/enum';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {colors} from '@theme/colors';
 
 export const LeftMessage = ({type, message, time, userName, avatar}) => {
   const video = useRef(null);
@@ -22,6 +24,21 @@ export const LeftMessage = ({type, message, time, userName, avatar}) => {
           <Text key={userName} style={styles.textValue}>
             {message}
           </Text>
+        </View>
+      )}
+
+      {type === enumMessenger.msgType.callOff && (
+        <View
+          style={{
+            backgroundColor: colors.gray01,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: 10,
+            borderRadius: 10,
+          }}>
+          <Ionicons name="call" />
+          <Text>{userName} ended the call</Text>
         </View>
       )}
 
@@ -73,6 +90,21 @@ export const RightMessage = ({type, message, time, userName, avatar}) => {
           {type === enumMessenger.msgType.image && (
             <View style={styles.image}>
               <Image source={{uri: message}} style={styles.imageMessage} />
+            </View>
+          )}
+
+          {type === enumMessenger.msgType.callOff && (
+            <View
+              style={{
+                backgroundColor: colors.gray01,
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: 10,
+                borderRadius: 10,
+              }}>
+              <Ionicons name="call" />
+              <Text>You ended the call</Text>
             </View>
           )}
 

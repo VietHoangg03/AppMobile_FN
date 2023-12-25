@@ -16,5 +16,6 @@ export const enumMessenger = {
     image: 1,
     file: 2,
     likeIcon: 3,
+    callOff: 4,
   },
 };

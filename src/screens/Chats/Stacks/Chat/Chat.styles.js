@@ -25,6 +25,11 @@ export const styles = StyleSheet.create({
     marginLeft: 6,
   },
 
+  greenIcon: {
+    color: '#267b00',
+    backgroundColor: '#267b00',
+  },
+
   iconEmoji: {
     fontSize: 21,
     color: colors.mainColor,

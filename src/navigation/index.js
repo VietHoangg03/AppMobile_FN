@@ -27,8 +27,8 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {colors} from '@theme/colors';
 import {getUsers} from '@redux/userSlice';
 
-// import IncomingCall from '@screens/Call/VoiceCall/IncomingCall';
-// import OutgoingCall from '@screens/Call/VoiceCall/OutgoingCall';
+import IncomingCall from '@screens/Call/VoiceCall/IncomingCall';
+import OutgoingCall from '@screens/Call/VoiceCall/OutgoingCall';
 
 const Stack = createStackNavigator();
 
@@ -269,7 +269,7 @@ export const RootNavigator = () => {
           headerShown: false,
         }}
       />
-      {/* <Stack.Screen
+      <Stack.Screen
         name="OutgoingCall"
         component={OutgoingCall}
         options={{
@@ -282,7 +282,7 @@ export const RootNavigator = () => {
         options={{
           headerShown: false,
         }}
-        />*/}
+      />
     </Stack.Navigator>
   );
 };

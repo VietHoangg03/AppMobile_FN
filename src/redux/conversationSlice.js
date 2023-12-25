@@ -45,7 +45,7 @@ const conversationSlice = createSlice({
 export const fetchConversations = (userId, token) => async dispatch => {
   try {
     const res = await getDataAPI(`conversation/user/${userId}`, token);
-    const conversations = [];
+    let conversations = [];
     if (res.status === 200 && res.data.conversations) {
       // Change title of Conversations whose title = '1vs1' into peerName
 
@@ -87,6 +87,12 @@ export const fetchConversations = (userId, token) => async dispatch => {
 
       dispatch(setLastMessages(lastMess));
 
+      conversations = conversations.sort((a, b) => {
+        const lastMessA = a.cntMessages[a.cntMessages.length - 1];
+        const lastMessB = b.cntMessages[b.cntMessages.length - 1];
+        return lastMessA.updatedAt > lastMessB.updatedAt ? -1 : 1;
+      });
+
       dispatch(getConversations(conversations));
     } else {
       console.log(res);
@@ -96,20 +102,19 @@ export const fetchConversations = (userId, token) => async dispatch => {
   }
 };
 
-export const fetchConversationById =
-  (conversationId, token) => async dispatch => {
-    try {
-      const res = await getDataAPI(`conversation/id/${conversationId}`, token);
+export const fetchConversationById = async (conversationId, token) => {
+  try {
+    const res = await getDataAPI(`conversation/id/${conversationId}`, token);
 
-      if (res.status === 200) {
-        dispatch(setCurrentConversation(res.data));
-      } else {
-        console.log(res);
-      }
-    } catch (err) {
-      console.log(err);
+    if (res.status === 200) {
+      return res.data;
+    } else {
+      console.log(res);
     }
-  };
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 export const fetchMembers = (conversationId, token) => async dispatch => {
   try {
